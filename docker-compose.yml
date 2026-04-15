@@ -1,0 +1,23 @@
+services:
+  fallback-app:
+    build: .
+    container_name: fallback-app
+    environment:
+      PRIMARY_BASE_URL: https://jsonplaceholder.typicode.com/todos
+      SECONDARY_BASE_URL: https://dummyjson.com/todos
+      REQUEST_TIMEOUT_SECONDS: 2.5
+    ports:
+      - "8000:8000"
+
+  prometheus:
+    image: prom/prometheus:v2.53.4
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - fallback-app
